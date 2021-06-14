@@ -41,6 +41,52 @@ num_shifts = len(shifts)
 
 solutions_to_find = 30
 
+shift_penalties = [
+	[8, 4, 7, 8, 0, 5, 0, 8, 2, 2, 1, 9, 1, 3, 5, 1, 1, 7, 8, 6, 9, 2, 8, 8, 2], # Day
+	[7, 9, 0, 6, 3, 2, 7, 7, 1, 7, 6, 4, 5, 3, 7, 5, 2, 6, 3, 4, 3, 0, 0, 3, 0], # Night
+]
+
+day_penalties = [
+	[6, 9, 3, 3, 7, 1, 6, 6, 6, 6, 8, 5, 5, 4, 3, 6, 7, 6, 1, 5, 8, 2, 0, 2, 5], # Monday
+    [9, 0, 2, 0, 5, 8, 4, 6, 9, 5, 1, 7, 9, 9, 8, 6, 2, 8, 3, 9, 7, 0, 9, 0, 3], # Tuesday
+    [7, 0, 0, 4, 4, 6, 5, 7, 8, 0, 7, 7, 4, 2, 7, 8, 5, 5, 7, 6, 0, 3, 6, 2, 6], # Wednesday
+    [8, 6, 0, 4, 8, 9, 3, 7, 4, 8, 9, 4, 6, 2, 6, 3, 5, 7, 0, 8, 7, 4, 7, 8, 5], # Thursday
+    [2, 2, 9, 0, 8, 6, 1, 2, 0, 5, 3, 7, 5, 9, 9, 3, 1, 3, 8, 7, 6, 2, 4, 2, 8], # Friday
+    [0, 1, 1, 7, 6, 7, 9, 3, 0, 1, 2, 9, 2, 8, 3, 1, 5, 1, 3, 4, 2, 7, 9, 7, 4], # Saturday
+    [9, 9, 0, 3, 3, 3, 9, 5, 2, 6, 9, 2, 8, 7, 3, 6, 9, 1, 8, 9, 1, 9, 3, 4, 4], # Sunday
+]
+
+# coworker_penalties = [
+# 	[0, 4, 1, 5, 4, 0, 0, 2, 3, 7, 7, 3, 4, 6, 9, 4, 3, 9, 7, 6, 5, 9, 2, 8, 0],
+# 	[2, 9, 1, 6, 7, 9, 8, 1, 9, 4, 6, 4, 2, 0, 6, 4, 9, 7, 4, 1, 9, 9, 2, 4, 7],
+#     [8, 4, 9, 1, 4, 0, 4, 0, 5, 3, 3, 3, 5, 6, 0, 4, 9, 8, 3, 3, 7, 9, 7, 7, 3],
+#     [2, 8, 0, 5, 6, 8, 1, 0, 7, 5, 4, 7, 3, 9, 4, 0, 1, 6, 5, 4, 4, 7, 4, 1, 3],
+#     [7, 3, 1, 0, 6, 6, 3, 3, 6, 3, 6, 6, 8, 4, 5, 1, 3, 4, 3, 3, 5, 4, 2, 2, 7],
+#     [7, 9, 1, 3, 3, 9, 4, 4, 4, 6, 9, 0, 0, 6, 8, 3, 5, 1, 3, 1, 7, 8, 1, 0, 4],
+#     [3, 0, 5, 0, 0, 8, 0, 1, 4, 5, 9, 4, 1, 9, 1, 8, 0, 3, 9, 0, 0, 2, 9, 5, 9],
+#     [1, 4, 1, 4, 9, 1, 4, 9, 6, 4, 1, 9, 1, 2, 0, 8, 1, 0, 7, 5, 6, 3, 8, 9, 7],
+#     [1, 0, 6, 2, 0, 8, 4, 4, 2, 9, 8, 0, 6, 5, 0, 7, 2, 5, 4, 0, 5, 1, 5, 1, 5],
+#     [4, 9, 1, 7, 3, 8, 0, 3, 8, 0, 9, 0, 3, 2, 0, 5, 4, 8, 8, 1, 6, 2, 1, 8, 6],
+#     [9, 2, 4, 9, 1, 0, 8, 9, 3, 9, 9, 2, 5, 9, 6, 3, 6, 3, 8, 0, 3, 9, 7, 5, 6],
+#     [6, 2, 6, 8, 5, 9, 9, 9, 0, 7, 4, 9, 1, 9, 1, 1, 0, 5, 0, 9, 0, 2, 6, 9, 4],
+#     [3, 7, 5, 2, 6, 4, 4, 4, 0, 8, 5, 4, 8, 2, 2, 2, 9, 0, 4, 0, 6, 2, 0, 9, 3],
+#     [8, 9, 3, 9, 1, 1, 8, 4, 4, 3, 8, 0, 5, 9, 5, 7, 7, 9, 7, 7, 6, 5, 5, 3, 2],
+#     [1, 2, 4, 9, 6, 4, 4, 0, 8, 0, 1, 7, 8, 3, 1, 6, 2, 7, 8, 1, 4, 0, 6, 3, 0],
+#     [9, 2, 0, 3, 3, 0, 4, 3, 1, 7, 0, 2, 7, 4, 4, 5, 4, 0, 9, 9, 8, 2, 7, 9, 3],
+#     [8, 8, 4, 7, 5, 7, 0, 7, 9, 0, 4, 2, 1, 3, 3, 3, 5, 1, 4, 8, 0, 7, 9, 2, 7],
+#     [1, 4, 0, 7, 8, 4, 0, 4, 3, 5, 7, 9, 8, 7, 5, 4, 3, 6, 5, 7, 6, 0, 4, 9, 4],
+#     [4, 9, 5, 6, 2, 6, 8, 2, 1, 4, 3, 6, 8, 1, 1, 0, 7, 3, 4, 3, 9, 9, 7, 3, 5],
+#     [2, 9, 4, 0, 3, 7, 9, 5, 3, 3, 0, 9, 5, 5, 3, 2, 0, 0, 2, 8, 8, 0, 4, 5, 7],
+#     [7, 9, 2, 9, 8, 8, 3, 3, 4, 5, 3, 2, 3, 0, 2, 1, 1, 1, 3, 9, 2, 6, 9, 6, 1],
+#     [2, 9, 7, 3, 1, 3, 3, 9, 1, 3, 5, 9, 7, 2, 9, 0, 9, 2, 4, 8, 0, 1, 8, 2, 5],
+#     [2, 1, 3, 6, 3, 8, 8, 9, 1, 5, 8, 1, 9, 4, 5, 4, 9, 5, 5, 4, 4, 0, 0, 8, 8],
+#     [6, 6, 2, 0, 5, 1, 9, 0, 8, 6, 0, 8, 4, 5, 5, 9, 7, 5, 5, 9, 5, 3, 6, 8, 9],
+# 	[0, 7, 8, 0, 7, 5, 5, 0, 5, 2, 8, 6, 9, 6, 4, 8, 4, 5, 9, 1, 0, 6, 2, 8, 9],
+# ]
+
+# day_penalties = numpy.zeros((7, num_employees))
+# for d in range(7):
+# 	day_penalties
 
 def negated_bounded_span(works, start, length):
 	"""Filters an isolated sub-sequence of variables assined to True.
@@ -268,8 +314,8 @@ class VarArraySolutionPrinterWithLimit(cp_model.CpSolverSolutionCallback):
 def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
-	print("\nStarting GWO\n")
-	GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	#print("\nStarting GWO\n")
+	#GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
 
 	print("Starting MFO\n")
 	MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
@@ -325,27 +371,29 @@ def NurseFitness(nurse, schedule):
 	# A nurse wants to work on 1 specific day. If assigned to work any other day
 	# then add 10 points (overall goal is to minimize this number)
 
+	nurse_index_range = range(nurse*num_days*num_shifts, (nurse+1)*num_days*num_shifts)
 
 	sum = 0
-	day_preference = nurse % num_days
-	for i in range(len(schedule)):
-
-		# NURSE
-		e = i // (num_days * num_shifts)
+	for i in nurse_index_range:
 
 		# 0-14 2 WEEKS
-		d = (i % (num_days * num_shifts)) // num_shifts
+		day = (i % (num_days * num_shifts)) // num_shifts
 
 		# DAY/NIGHT
-		s = i % num_shifts
+		shift = i % num_shifts
 
-		# VIOLATION 1 BACK TO BACK SHIFTS 4 IN A ROW
+		# VIOLATION 1 BACK TO BACK SHIFTS
+		if i + 1 < nurse_index_range.stop:
+			if schedule[i] == 1 and schedule[i+1] == 1:
+				sum += 10
 
 		# VIOLATION 2 DAY OF PREFERENCE
-		if schedule[i] == 1 and d != day_preference:
-			sum += 10
+		if schedule[i] == 1:
+			sum += day_penalties[day % 7][nurse]
 
 		# VIOLATION 3 PREFERENCE FOR NIGHT OF DAY SHIFTS
+		if schedule[i] == 1:
+			sum += shift_penalties[shift][nurse]
 
 		# VIOLATION 4 PREFERENCE TO WORK WITH ANOTHER NURSE
 	return sum
