@@ -21,6 +21,7 @@ from google.protobuf import text_format
 
 import MFO
 import GWO
+import MVO
 
 FLAGS = flags.FLAGS
 
@@ -201,7 +202,7 @@ def solve_shift_scheduling(params, output_proto):
 	"""Solves the shift scheduling problem."""
 
 	# The required number of shifts worked per week (min, max)
-	max_shifts_per_week_constraint = (3, 4)
+	max_shifts_per_week_constraint = (0, 4)
 	
 	# The required number of day shifts in a 2 week schedule (min, max)
 	day_shifts_per_two_weeks = (1, num_days * num_shifts)
@@ -318,7 +319,9 @@ def main(_):
 	#GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
 
 	print("Starting MFO\n")
-	MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	#MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+
+	MVO.MVO(solutions, Fitness, 0, 1, 100, PrintSchedule)
 
 def PrintSchedule(schedule):
 	header = '           '
@@ -360,7 +363,7 @@ def CheckValidity(schedule):
 			for i in range(nurse * week * 7 * num_shifts, nurse * week * 7 * num_shifts + 7 * num_shifts):
 				if schedule[i] == 1:
 					shift_count += 1
-			if shift_count < 3 or shift_count > 4:
+			if shift_count > 4:
 				return False
 
 	return True
