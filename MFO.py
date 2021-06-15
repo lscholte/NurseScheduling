@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 16 10:42:18 2016
-
 @author: hossam
 """
 
@@ -11,8 +10,7 @@ import math
 from solution import solution
 import time
 
-
-def MFO(initial_solutions, objf, lb, ub, Max_iteration):
+def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer):
 
 	# Max_iteration=1000
 	# lb=-100
@@ -134,7 +132,7 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration):
 					t = (a - 1) * random.random() + 1
 					#
 					#				 % Eq. (3.12)
-					Moth_pos[i, j] = (
+					Moth_pos[i, j] = round(
 						distance_to_flame * math.exp(b * t) * math.cos(t * 2 * math.pi)
 						+ sorted_population[i, j]
 					)
@@ -150,10 +148,13 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration):
 					t = (a - 1) * random.random() + 1
 					#
 					#				 % Eq. (3.12)
-					Moth_pos[i, j] = (
+					Moth_pos[i, j] = round(
 						distance_to_flame * math.exp(b * t) * math.cos(t * 2 * math.pi)
 						+ sorted_population[Flame_no, j]
 					)
+			
+			swap_index = random.randrange(dim)
+			Moth_pos[i, swap_index] = abs(Moth_pos[i, swap_index] - 1)
 
 		Convergence_curve[Iteration] = Best_flame_score
 		# Display best fitness along the iteration
@@ -169,6 +170,7 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration):
 
 		Iteration = Iteration + 1
 
+	printer(Best_flame_pos)
 	timerEnd = time.time()
 	s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
 	s.executionTime = timerEnd - timerStart
@@ -177,5 +179,3 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration):
 	s.objfname = objf.__name__
 
 	return s
-
-

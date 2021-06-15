@@ -21,6 +21,7 @@ from google.protobuf import text_format
 
 import MFO
 import GWO
+import MVO
 
 FLAGS = flags.FLAGS
 
@@ -41,19 +42,62 @@ num_shifts = len(shifts)
 
 solutions_to_find = 30
 
+shift_penalties = [
+	[5, 10,  5,  5,  0,  0,  5, 10,  0, 10, 10,  5,  5,  0,  5,  0, 10,  5,  5,  0,  5, 10, 10, 10,  5], # Day
+	[5,  0,  5,  5, 10, 10,  5,  0, 10,  0,  0,  5,  5, 10,  5, 10,  0,  5,  5, 10,  5,  0,  0,  0,  5], # Night
+]
+
+day_penalties = [
+	[10, 10,  5,  5,  0,  5, 10, 10, 10,  5,  5,  5,  5,  0,  5,  5,  5,  5,  0,  5,  0,  5,  5,  0,  5], # Mon
+    [ 0,  5, 10,  0,  5,  5,  5,  5,  5,  0,  0,  5,  5, 10,  5, 10, 10,  0, 10,  5,  5,  0,  5,  5,  0], # Tue
+    [ 5,  5,  5,  5,  5,  5,  0,  0, 10, 10,  0,  5, 10,  5,  0,  5,  5, 10,  5, 10, 10,  5, 10,  5,  5], # Wed
+    [ 5,  0,  5,  0, 10, 10,  5,  5,  5,  0, 10, 10,  0, 10, 10, 10, 10,  5,  5,  0,  5, 10,  0,  0, 10], # Thur
+    [ 0,  5,  0,  5,  5, 10,  5, 10,  0,  5,  5, 10,  0,  0,  5,  0,  0,  5,  0,  5,  5,  0,  5, 10, 10], # Fri
+    [10, 10, 10, 10, 10,  0, 10,  0,  0, 10, 10,  0, 10,  5,  0,  5,  0,  0, 10,  0,  0,  5, 10, 10,  5], # Sat
+    [ 5,  0,  0, 10,  0,  0,  0,  5,  5,  5,  5,  0,  5,  5, 10,  0,  5, 10,  5, 10, 10, 10,  0,  5,  0], # Sun
+]
+
+# coworker_penalties = [
+# 	[0, 4, 1, 5, 4, 0, 0, 2, 3, 7, 7, 3, 4, 6, 9, 4, 3, 9, 7, 6, 5, 9, 2, 8, 0],
+# 	[2, 9, 1, 6, 7, 9, 8, 1, 9, 4, 6, 4, 2, 0, 6, 4, 9, 7, 4, 1, 9, 9, 2, 4, 7],
+#     [8, 4, 9, 1, 4, 0, 4, 0, 5, 3, 3, 3, 5, 6, 0, 4, 9, 8, 3, 3, 7, 9, 7, 7, 3],
+#     [2, 8, 0, 5, 6, 8, 1, 0, 7, 5, 4, 7, 3, 9, 4, 0, 1, 6, 5, 4, 4, 7, 4, 1, 3],
+#     [7, 3, 1, 0, 6, 6, 3, 3, 6, 3, 6, 6, 8, 4, 5, 1, 3, 4, 3, 3, 5, 4, 2, 2, 7],
+#     [7, 9, 1, 3, 3, 9, 4, 4, 4, 6, 9, 0, 0, 6, 8, 3, 5, 1, 3, 1, 7, 8, 1, 0, 4],
+#     [3, 0, 5, 0, 0, 8, 0, 1, 4, 5, 9, 4, 1, 9, 1, 8, 0, 3, 9, 0, 0, 2, 9, 5, 9],
+#     [1, 4, 1, 4, 9, 1, 4, 9, 6, 4, 1, 9, 1, 2, 0, 8, 1, 0, 7, 5, 6, 3, 8, 9, 7],
+#     [1, 0, 6, 2, 0, 8, 4, 4, 2, 9, 8, 0, 6, 5, 0, 7, 2, 5, 4, 0, 5, 1, 5, 1, 5],
+#     [4, 9, 1, 7, 3, 8, 0, 3, 8, 0, 9, 0, 3, 2, 0, 5, 4, 8, 8, 1, 6, 2, 1, 8, 6],
+#     [9, 2, 4, 9, 1, 0, 8, 9, 3, 9, 9, 2, 5, 9, 6, 3, 6, 3, 8, 0, 3, 9, 7, 5, 6],
+#     [6, 2, 6, 8, 5, 9, 9, 9, 0, 7, 4, 9, 1, 9, 1, 1, 0, 5, 0, 9, 0, 2, 6, 9, 4],
+#     [3, 7, 5, 2, 6, 4, 4, 4, 0, 8, 5, 4, 8, 2, 2, 2, 9, 0, 4, 0, 6, 2, 0, 9, 3],
+#     [8, 9, 3, 9, 1, 1, 8, 4, 4, 3, 8, 0, 5, 9, 5, 7, 7, 9, 7, 7, 6, 5, 5, 3, 2],
+#     [1, 2, 4, 9, 6, 4, 4, 0, 8, 0, 1, 7, 8, 3, 1, 6, 2, 7, 8, 1, 4, 0, 6, 3, 0],
+#     [9, 2, 0, 3, 3, 0, 4, 3, 1, 7, 0, 2, 7, 4, 4, 5, 4, 0, 9, 9, 8, 2, 7, 9, 3],
+#     [8, 8, 4, 7, 5, 7, 0, 7, 9, 0, 4, 2, 1, 3, 3, 3, 5, 1, 4, 8, 0, 7, 9, 2, 7],
+#     [1, 4, 0, 7, 8, 4, 0, 4, 3, 5, 7, 9, 8, 7, 5, 4, 3, 6, 5, 7, 6, 0, 4, 9, 4],
+#     [4, 9, 5, 6, 2, 6, 8, 2, 1, 4, 3, 6, 8, 1, 1, 0, 7, 3, 4, 3, 9, 9, 7, 3, 5],
+#     [2, 9, 4, 0, 3, 7, 9, 5, 3, 3, 0, 9, 5, 5, 3, 2, 0, 0, 2, 8, 8, 0, 4, 5, 7],
+#     [7, 9, 2, 9, 8, 8, 3, 3, 4, 5, 3, 2, 3, 0, 2, 1, 1, 1, 3, 9, 2, 6, 9, 6, 1],
+#     [2, 9, 7, 3, 1, 3, 3, 9, 1, 3, 5, 9, 7, 2, 9, 0, 9, 2, 4, 8, 0, 1, 8, 2, 5],
+#     [2, 1, 3, 6, 3, 8, 8, 9, 1, 5, 8, 1, 9, 4, 5, 4, 9, 5, 5, 4, 4, 0, 0, 8, 8],
+#     [6, 6, 2, 0, 5, 1, 9, 0, 8, 6, 0, 8, 4, 5, 5, 9, 7, 5, 5, 9, 5, 3, 6, 8, 9],
+# 	[0, 7, 8, 0, 7, 5, 5, 0, 5, 2, 8, 6, 9, 6, 4, 8, 4, 5, 9, 1, 0, 6, 2, 8, 9],
+# ]
+
+# day_penalties = numpy.zeros((7, num_employees))
+# for d in range(7):
+# 	day_penalties
 
 def negated_bounded_span(works, start, length):
 	"""Filters an isolated sub-sequence of variables assined to True.
-
   Extract the span of Boolean variables [start, start + length), negate them,
   and if there is variables to the left/right of this span, surround the span by
   them in non negated form.
-
   Args:
 	works: a list of variables to extract the span from.
 	start: the start to the span.
 	length: the length of the span.
-
   Returns:
 	a list of variables which conjunction will be false if the sub-list is
 	assigned to True, and correctly bounded by variables assigned to False,
@@ -73,11 +117,9 @@ def negated_bounded_span(works, start, length):
 
 def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 	"""Sequence constraint on true variables with soft and hard bounds.
-
   This constraint look at every maximal contiguous sequence of variables
   assigned to true. If forbids sequence of length < hard_min or > hard_max.
   Then it creates penalty terms if the length is < soft_min or > soft_max.
-
   Args:
 	model: the sequence constraint is built on this model.
 	works: a list of Boolean variables.
@@ -94,7 +136,6 @@ def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 	max_cost: the coefficient of the linear penalty if the length is more than
 	  soft_max.
 	prefix: a base name for penalty literals.
-
   Returns:
 	a tuple (variables_list, coefficient_list) containing the different
 	penalties created by the sequence constraint.
@@ -116,11 +157,9 @@ def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 
 def add_soft_sum_constraint(model, works, hard_min, hard_max, prefix):
 	"""Sum constraint with soft and hard bounds.
-
   This constraint counts the variables assigned to true from works.
   If forbids sum < hard_min or > hard_max.
   Then it creates penalty terms if the sum is < soft_min or > soft_max.
-
   Args:
 	model: the sequence constraint is built on this model.
 	works: a list of Boolean variables.
@@ -137,7 +176,6 @@ def add_soft_sum_constraint(model, works, hard_min, hard_max, prefix):
 	max_cost: the coefficient of the linear penalty if the sum is more than
 	  soft_max.
 	prefix: a base name for penalty variables.
-
   Returns:
 	a tuple (variables_list, coefficient_list) containing the different
 	penalties created by the sequence constraint.
@@ -155,7 +193,7 @@ def solve_shift_scheduling(params, output_proto):
 	"""Solves the shift scheduling problem."""
 
 	# The required number of shifts worked per week (min, max)
-	max_shifts_per_week_constraint = (3, 4)
+	max_shifts_per_week_constraint = (0, 4)
 	
 	# The required number of day shifts in a 2 week schedule (min, max)
 	day_shifts_per_two_weeks = (1, num_days * num_shifts)
@@ -269,49 +307,94 @@ def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
 	print("\nStarting GWO\n")
-	GWO.GWO(solutions, Fitness, 0, 1, 1000)
+	GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
 
 	print("Starting MFO\n")
-	MFO.MFO(solutions, Fitness, 0, 1, 1000)
+	MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
 
+	print("Starting MVO\n")
+	MVO.MVO(solutions, Fitness, 0, 1, 100, PrintSchedule)
+
+def PrintSchedule(schedule):
+	header = '           '
+	for w in range(1):
+		header += 'M   T   W   T   F   S   S   M   T   W   T   F   S   S'
+	print(header)
+	for e in range(num_employees):
+		schedule_text = ''
+		for d in range(num_days):
+			schedule_to_add = ''
+			i = e * (num_days*num_shifts) + d * num_shifts
+			if schedule[i] == 1:
+				schedule_to_add += 'D'
+			if schedule[i+1] == 1:
+				schedule_to_add += 'N'
+			schedule_text += schedule_to_add.ljust(4)
+		print('worker %2i: %s' % (e, schedule_text))
+	print()
 	
 def CheckValidity(schedule):
 	# Check for correct number of nurses assigned to shifts
+	for d in range(num_days):
+		for s in range(num_shifts):
+			nurses_on_shift = [schedule[i] for i in range(len(schedule)) if (i % (num_days * num_shifts)) // num_shifts == d and i % num_shifts == s].count(1)
+			if nurses_on_shift != 7:
+				return False	
+
+	for nurse in range(num_employees):
+		day_shift_req_met = False
+		for i in range(nurse * num_days * num_shifts, (nurse+1) * num_days * num_shifts, 2):
+			if schedule[i] == 1:
+				day_shift_req_met = True
+				break
+		if not day_shift_req_met:
+			return False
+		
+		for week in range(num_weeks):
+			shift_count = 0
+			for i in range(nurse * week * 7 * num_shifts, nurse * week * 7 * num_shifts + 7 * num_shifts):
+				if schedule[i] == 1:
+					shift_count += 1
+			if shift_count > 4:
+				return False
+
 	return True
+
 	
 def NurseFitness(nurse, schedule):
 	# Arbitrary implementation of a fitness function.
 	# A nurse wants to work on 1 specific day. If assigned to work any other day
 	# then add 10 points (overall goal is to minimize this number)
 
+	nurse_index_range = range(nurse*num_days*num_shifts, (nurse+1)*num_days*num_shifts)
 
 	sum = 0
-	day_preference = nurse % num_days
-	for i in range(len(schedule)):
-
-		# NURSE
-		e = i // (num_days * num_shifts)
+	for i in nurse_index_range:
 
 		# 0-14 2 WEEKS
-		d = (i % (num_days * num_shifts)) // num_shifts
+		day = (i % (num_days * num_shifts)) // num_shifts
 
 		# DAY/NIGHT
-		s = i % num_shifts
+		shift = i % num_shifts
 
-		# VIOLATION 1 BACK TO BACK SHIFTS 4 IN A ROW
+		# VIOLATION 1 BACK TO BACK SHIFTS
+		if i + 1 < nurse_index_range.stop:
+			if schedule[i] == 1 and schedule[i+1] == 1:
+				sum += 10
 
 		# VIOLATION 2 DAY OF PREFERENCE
-		if schedule[i] == 1 and d != day_preference:
-			sum += 10
+		if schedule[i] == 1:
+			sum += day_penalties[day % 7][nurse]
 
 		# VIOLATION 3 PREFERENCE FOR NIGHT OF DAY SHIFTS
+		if schedule[i] == 1:
+			sum += shift_penalties[shift][nurse]
 
 		# VIOLATION 4 PREFERENCE TO WORK WITH ANOTHER NURSE
 	return sum
 	
 def Fitness(schedule):
 	sum = 0
-	sum += CheckValidity(schedule)
 
 	if CheckValidity(schedule):
 		for nurse in range(num_employees):
