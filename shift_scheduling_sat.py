@@ -344,11 +344,11 @@ def main(_):
 	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
 	
 	# naming the x axis
-	plt.xlabel('x - Fitness Score')
+	plt.xlabel('x - Iterations')
 	# naming the y axis
-	plt.ylabel('y - Time')
+	plt.ylabel('y - Fitness Score')
 	# giving a title to my graph
-	plt.title('Fitness Score Vs Time(s)')
+	plt.title('Fitness Score Vs Iterations')
 	
 	# show a legend on the plot
 	plt.legend()
