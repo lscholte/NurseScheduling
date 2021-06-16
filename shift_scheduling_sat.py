@@ -16,8 +16,10 @@
 from absl import app
 from absl import flags
 
+import matplotlib.pyplot as plt
 from ortools.sat.python import cp_model
 from google.protobuf import text_format
+import numpy as np
 
 import MFO
 import GWO
@@ -41,6 +43,23 @@ num_days = num_weeks * 7
 num_shifts = len(shifts)
 
 solutions_to_find = 30
+
+mfoScore_x_iterations = []
+gwoScore_x_iterations = []
+mvoScore_x_iterations = []
+
+interactions = 100
+interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
+gwoIterations = []
+mvoIterations = []
+
+mfoScore_x_time = []
+gwoScore_x_time = []
+mvoScore_x_time = []
+
+mfoTime = []
+gwoTime = []
+mvoTime = []
 
 shift_penalties = [
 	[5, 10,  5,  5,  0,  0,  5, 10,  0, 10, 10,  5,  5,  0,  5,  0, 10,  5,  5,  0,  5, 10, 10, 10,  5], # Day
@@ -307,13 +326,35 @@ def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
 	print("\nStarting GWO\n")
-	GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScore_x_iterations)
 
 	print("Starting MFO\n")
-	MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
 
 	print("Starting MVO\n")
-	MVO.MVO(solutions, Fitness, 0, 1, 100, PrintSchedule)
+	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
+
+	# plotting the Moth Flame vs Iterations
+	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
+	
+	# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
+
+		# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+	
+	# naming the x axis
+	plt.xlabel('x - Fitness Score')
+	# naming the y axis
+	plt.ylabel('y - Time')
+	# giving a title to my graph
+	plt.title('Fitness Score Vs Time(s)')
+	
+	# show a legend on the plot
+	plt.legend()
+	
+	# function to show the plot
+	plt.show()
 
 def PrintSchedule(schedule):
 	header = '           '

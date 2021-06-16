@@ -87,7 +87,7 @@ def findRandomShiftIndex(solution, shift, value):
 
 
 
-def MVO(initial_solutions, objf, lb, ub, Max_time, printer):
+def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iterations):
 
 
     "parameters"
@@ -336,6 +336,7 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer):
                     + str(Best_universe_Inflation_rate)
                 ]
             )
+            mvoScore_x_iterations.append(Best_universe_Inflation_rate)
             # for universe in Universes:
                 # print(Best_universe - universe)
                 # sum = 0

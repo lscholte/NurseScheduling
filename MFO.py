@@ -10,7 +10,7 @@ import math
 from solution import solution
 import time
 
-def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer):
+def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer, mfoScore_x_iterations):
 
 	# Max_iteration=1000
 	# lb=-100
@@ -167,10 +167,11 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer):
 					+ str(Best_flame_score)
 				]
 			)
+			mfoScore_x_iterations.append(Best_flame_score)
 
 		Iteration = Iteration + 1
 
-	printer(Best_flame_pos)
+	# printer(Best_flame_pos)
 	timerEnd = time.time()
 	s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
 	s.executionTime = timerEnd - timerStart
