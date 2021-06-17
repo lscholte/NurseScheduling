@@ -336,14 +336,7 @@ class VarArraySolutionPrinterWithLimit(cp_model.CpSolverSolutionCallback):
 	
 def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
-	
-	mfoCPU_x_iterations = []
-	gwoCPU_x_iterations = []
-	mvoCPU_x_iterations = []
 
-	mfoRAM_x_iterations = []
-	gwoRAM_x_iterations = []
-	mvoRAM_x_iterations = []
 	print("\nStarting GWO\n")
 	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, 
 	gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations)
