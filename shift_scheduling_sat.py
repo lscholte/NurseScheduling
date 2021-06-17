@@ -16,8 +16,10 @@
 from absl import app
 from absl import flags
 
+import matplotlib.pyplot as plt
 from ortools.sat.python import cp_model
 from google.protobuf import text_format
+import numpy as np
 
 import MFO
 import GWO
@@ -41,6 +43,23 @@ num_days = num_weeks * 7
 num_shifts = len(shifts)
 
 solutions_to_find = 30
+
+mfoScore_x_iterations = []
+gwoScore_x_iterations = []
+mvoScore_x_iterations = []
+
+interactions = 100
+interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
+gwoIterations = []
+mvoIterations = []
+
+mfoScore_x_time = []
+gwoScore_x_time = []
+mvoScore_x_time = []
+
+mfoTime = []
+gwoTime = []
+mvoTime = []
 
 shift_penalties = [
 	[5, 10,  5,  5,  0,  0,  5, 10,  0, 10, 10,  5,  5,  0,  5,  0, 10,  5,  5,  0,  5, 10, 10, 10,  5], # Day
@@ -87,16 +106,13 @@ coworker_penalties = [
 
 def negated_bounded_span(works, start, length):
 	"""Filters an isolated sub-sequence of variables assined to True.
-
   Extract the span of Boolean variables [start, start + length), negate them,
   and if there is variables to the left/right of this span, surround the span by
   them in non negated form.
-
   Args:
 	works: a list of variables to extract the span from.
 	start: the start to the span.
 	length: the length of the span.
-
   Returns:
 	a list of variables which conjunction will be false if the sub-list is
 	assigned to True, and correctly bounded by variables assigned to False,
@@ -116,11 +132,9 @@ def negated_bounded_span(works, start, length):
 
 def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 	"""Sequence constraint on true variables with soft and hard bounds.
-
   This constraint look at every maximal contiguous sequence of variables
   assigned to true. If forbids sequence of length < hard_min or > hard_max.
   Then it creates penalty terms if the length is < soft_min or > soft_max.
-
   Args:
 	model: the sequence constraint is built on this model.
 	works: a list of Boolean variables.
@@ -137,7 +151,6 @@ def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 	max_cost: the coefficient of the linear penalty if the length is more than
 	  soft_max.
 	prefix: a base name for penalty literals.
-
   Returns:
 	a tuple (variables_list, coefficient_list) containing the different
 	penalties created by the sequence constraint.
@@ -159,11 +172,9 @@ def add_soft_sequence_constraint(model, works, hard_min, hard_max, prefix):
 
 def add_soft_sum_constraint(model, works, hard_min, hard_max, prefix):
 	"""Sum constraint with soft and hard bounds.
-
   This constraint counts the variables assigned to true from works.
   If forbids sum < hard_min or > hard_max.
   Then it creates penalty terms if the sum is < soft_min or > soft_max.
-
   Args:
 	model: the sequence constraint is built on this model.
 	works: a list of Boolean variables.
@@ -180,7 +191,6 @@ def add_soft_sum_constraint(model, works, hard_min, hard_max, prefix):
 	max_cost: the coefficient of the linear penalty if the sum is more than
 	  soft_max.
 	prefix: a base name for penalty variables.
-
   Returns:
 	a tuple (variables_list, coefficient_list) containing the different
 	penalties created by the sequence constraint.
@@ -311,13 +321,36 @@ class VarArraySolutionPrinterWithLimit(cp_model.CpSolverSolutionCallback):
 def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
-	#print("\nStarting GWO\n")
-	#GWO.GWO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	print("\nStarting GWO\n")
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScore_x_iterations)
 
 	print("Starting MFO\n")
-	MFO.MFO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
 
-	#MVO.MVO(solutions, Fitness, 0, 1, 1000, PrintSchedule)
+	print("Starting MVO\n")
+	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
+
+	# plotting the Moth Flame vs Iterations
+	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
+	
+	# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
+
+		# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+	
+	# naming the x axis
+	plt.xlabel('x - Iterations')
+	# naming the y axis
+	plt.ylabel('y - Fitness Score')
+	# giving a title to my graph
+	plt.title('Fitness Score Vs Iterations')
+	
+	# show a legend on the plot
+	plt.legend()
+	
+	# function to show the plot
+	plt.show()
 
 def PrintSchedule(schedule):
 	header = '           '
