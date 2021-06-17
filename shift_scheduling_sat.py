@@ -236,13 +236,13 @@ def solve_shift_scheduling(params, output_proto):
 				model.Add(worked == sum(works))
 				
 	# Handle the min day shifts per 2 weeks constraint
-	# hard_min, hard_max = day_shifts_per_two_weeks
-	# for e in range(num_employees):
-		# works = [work[e, d, day_shift] for d in range(num_days)]
-		# variables, coeffs = add_soft_sum_constraint(
-				# model, works, hard_min, hard_max,
-				# 'weekly_sum_constraint(employee %i, day shift)' %
-				# (e))
+	hard_min, hard_max = day_shifts_per_two_weeks
+	for e in range(num_employees):
+		works = [work[e, d, day_shift] for d in range(num_days)]
+		variables, coeffs = add_soft_sum_constraint(
+				model, works, hard_min, hard_max,
+				'weekly_sum_constraint(employee %i, day shift)' %
+				(e))
 
 	# Handle the max shifts per week constraint
 	hard_min, hard_max = max_shifts_per_week_constraint
