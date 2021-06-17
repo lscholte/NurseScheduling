@@ -9,6 +9,7 @@ import time
 import math
 #import shift_scheduling_sat
 import sklearn
+import psutil
 from numpy import asarray
 from sklearn.preprocessing import normalize
 from solution import solution
@@ -87,7 +88,8 @@ def findRandomShiftIndex(solution, shift, value):
 
 
 
-def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iterations):
+def MVO(initial_solutions, objf, lb, ub, Max_time, printer,
+mvoScore_x_iterations, mvoScore_x_time, mvoCPU_x_iterations, mvoRAM_x_iterations):
 
 
     "parameters"
@@ -337,6 +339,8 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iteration
                 ]
             )
             mvoScore_x_iterations.append(Best_universe_Inflation_rate)
+            mvoRAM_x_iterations.append(psutil.virtual_memory()[2])
+            mvoCPU_x_iterations.append(psutil.cpu_percent(1))
             # for universe in Universes:
                 # print(Best_universe - universe)
                 # sum = 0

@@ -6,3 +6,4 @@ matplotlib
 fcmaes
 absl-py
 ortools
+psutil

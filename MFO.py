@@ -9,8 +9,10 @@ import numpy
 import math
 from solution import solution
 import time
+import psutil
 
-def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer, mfoScore_x_iterations):
+def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer,
+mfoScore_x_iterations, mfoScore_x_time, mfoCPU_x_iterations, mfoRAM_x_iterations):
 
 	# Max_iteration=1000
 	# lb=-100
@@ -168,6 +170,8 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer, mfoScore_x_iter
 				]
 			)
 			mfoScore_x_iterations.append(Best_flame_score)
+			mfoCPU_x_iterations.append(psutil.cpu_percent(1))
+			mfoRAM_x_iterations.append(psutil.virtual_memory()[2])
 
 		Iteration = Iteration + 1
 

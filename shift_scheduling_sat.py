@@ -48,6 +48,18 @@ mfoScore_x_iterations = []
 gwoScore_x_iterations = []
 mvoScore_x_iterations = []
 
+mfoScore_x_time = []
+gwoScore_x_time = []
+mvoScore_x_time = []
+
+mfoCPU_x_iterations = []
+gwoCPU_x_iterations = []
+mvoCPU_x_iterations = []
+
+mfoRAM_x_iterations = []
+gwoRAM_x_iterations = []
+mvoRAM_x_iterations = []
+
 interactions = 100
 interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
 gwoIterations = []
@@ -76,33 +88,33 @@ day_penalties = [
     [ 5,  0,  0, 10,  0,  0,  0,  5,  5,  5,  5,  0,  5,  5, 10,  0,  5, 10,  5, 10, 10, 10,  0,  5,  0], # Sun
 ]
 
-# coworker_penalties = [
-# 	[0, 4, 1, 5, 4, 0, 0, 2, 3, 7, 7, 3, 4, 6, 9, 4, 3, 9, 7, 6, 5, 9, 2, 8, 0],
-# 	[2, 9, 1, 6, 7, 9, 8, 1, 9, 4, 6, 4, 2, 0, 6, 4, 9, 7, 4, 1, 9, 9, 2, 4, 7],
-#     [8, 4, 9, 1, 4, 0, 4, 0, 5, 3, 3, 3, 5, 6, 0, 4, 9, 8, 3, 3, 7, 9, 7, 7, 3],
-#     [2, 8, 0, 5, 6, 8, 1, 0, 7, 5, 4, 7, 3, 9, 4, 0, 1, 6, 5, 4, 4, 7, 4, 1, 3],
-#     [7, 3, 1, 0, 6, 6, 3, 3, 6, 3, 6, 6, 8, 4, 5, 1, 3, 4, 3, 3, 5, 4, 2, 2, 7],
-#     [7, 9, 1, 3, 3, 9, 4, 4, 4, 6, 9, 0, 0, 6, 8, 3, 5, 1, 3, 1, 7, 8, 1, 0, 4],
-#     [3, 0, 5, 0, 0, 8, 0, 1, 4, 5, 9, 4, 1, 9, 1, 8, 0, 3, 9, 0, 0, 2, 9, 5, 9],
-#     [1, 4, 1, 4, 9, 1, 4, 9, 6, 4, 1, 9, 1, 2, 0, 8, 1, 0, 7, 5, 6, 3, 8, 9, 7],
-#     [1, 0, 6, 2, 0, 8, 4, 4, 2, 9, 8, 0, 6, 5, 0, 7, 2, 5, 4, 0, 5, 1, 5, 1, 5],
-#     [4, 9, 1, 7, 3, 8, 0, 3, 8, 0, 9, 0, 3, 2, 0, 5, 4, 8, 8, 1, 6, 2, 1, 8, 6],
-#     [9, 2, 4, 9, 1, 0, 8, 9, 3, 9, 9, 2, 5, 9, 6, 3, 6, 3, 8, 0, 3, 9, 7, 5, 6],
-#     [6, 2, 6, 8, 5, 9, 9, 9, 0, 7, 4, 9, 1, 9, 1, 1, 0, 5, 0, 9, 0, 2, 6, 9, 4],
-#     [3, 7, 5, 2, 6, 4, 4, 4, 0, 8, 5, 4, 8, 2, 2, 2, 9, 0, 4, 0, 6, 2, 0, 9, 3],
-#     [8, 9, 3, 9, 1, 1, 8, 4, 4, 3, 8, 0, 5, 9, 5, 7, 7, 9, 7, 7, 6, 5, 5, 3, 2],
-#     [1, 2, 4, 9, 6, 4, 4, 0, 8, 0, 1, 7, 8, 3, 1, 6, 2, 7, 8, 1, 4, 0, 6, 3, 0],
-#     [9, 2, 0, 3, 3, 0, 4, 3, 1, 7, 0, 2, 7, 4, 4, 5, 4, 0, 9, 9, 8, 2, 7, 9, 3],
-#     [8, 8, 4, 7, 5, 7, 0, 7, 9, 0, 4, 2, 1, 3, 3, 3, 5, 1, 4, 8, 0, 7, 9, 2, 7],
-#     [1, 4, 0, 7, 8, 4, 0, 4, 3, 5, 7, 9, 8, 7, 5, 4, 3, 6, 5, 7, 6, 0, 4, 9, 4],
-#     [4, 9, 5, 6, 2, 6, 8, 2, 1, 4, 3, 6, 8, 1, 1, 0, 7, 3, 4, 3, 9, 9, 7, 3, 5],
-#     [2, 9, 4, 0, 3, 7, 9, 5, 3, 3, 0, 9, 5, 5, 3, 2, 0, 0, 2, 8, 8, 0, 4, 5, 7],
-#     [7, 9, 2, 9, 8, 8, 3, 3, 4, 5, 3, 2, 3, 0, 2, 1, 1, 1, 3, 9, 2, 6, 9, 6, 1],
-#     [2, 9, 7, 3, 1, 3, 3, 9, 1, 3, 5, 9, 7, 2, 9, 0, 9, 2, 4, 8, 0, 1, 8, 2, 5],
-#     [2, 1, 3, 6, 3, 8, 8, 9, 1, 5, 8, 1, 9, 4, 5, 4, 9, 5, 5, 4, 4, 0, 0, 8, 8],
-#     [6, 6, 2, 0, 5, 1, 9, 0, 8, 6, 0, 8, 4, 5, 5, 9, 7, 5, 5, 9, 5, 3, 6, 8, 9],
-# 	[0, 7, 8, 0, 7, 5, 5, 0, 5, 2, 8, 6, 9, 6, 4, 8, 4, 5, 9, 1, 0, 6, 2, 8, 9],
-# ]
+coworker_penalties = [
+	[ 5,  5, 10,  5,  5,  5,  5,  0, 10,  0,  0,  5, 10,  5,  0,  5,  5,  5,  5, 10,  0, 10,  5,  5,  5],
+    [10,  0,  5,  0,  0,  5, 10,  5,  5,  5,  5,  5, 10,  5,  5,  5,  5, 10,  5,  5,  5,  0,  5, 10,  0],
+    [ 5, 10,  5, 10,  5,  5,  0,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  0,  5,  5,  5, 10, 10,  0, 10],
+	[ 5,  5,  0, 10,  5,  5,  5,  5,  5,  5,  0, 10,  5,  5,  0,  5, 10, 10,  5,  0,  5,  0,  5, 10,  5],
+    [ 5,  5,  5, 10,  0, 10,  5,  5, 10,  5,  5,  0,  0,  5,  5,  0,  5,  5,  5,  5, 10,  5, 10,  5,  0],
+    [ 5,  5, 10, 10,  5,  0,  5, 10,  5,  5,  5,  5,  0,  0,  0, 10,  5,  5,  5,  5,  5,  5,  0,  5, 10],
+    [ 0,  0, 10,  5,  0,  0, 10,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 10, 10,  5,  5,  5, 10,  0,  5],
+    [ 0, 10,  5, 10,  5,  5,  5,  5,  5,  5,  5,  5,  5, 10,  5,  0,  5,  5,  0,  5,  0,  5, 10,  0, 10],
+    [10,  5,  5, 10,  0,  0,  5,  5, 10,  5,  5,  5,  5,  0,  0,  5, 10,  5,  5,  5,  5,  0,  5, 10,  5],
+    [10, 10,  5,  5,  5, 10,  5,  0,  0,  0,  5, 10,  5,  5,  5,  5, 10,  0,  0,  5,  5,  5,  5,  5,  5],
+    [ 0,  5,  5, 10, 10,  5,  5,  5,  5, 10,  5,  5, 10,  5,  5,  0,  0,  0, 10,  5,  0,  5,  5,  5,  5],
+    [ 5,  0,  0,  5, 10,  5,  0, 10,  5,  5, 10,  5, 10, 10,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  5],
+    [ 5,  0,  5, 10, 10,  0, 10,  5,  0,  5, 10,  5,  0, 10,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5],
+    [ 0,  5,  5, 10,  0,  5,  5,  5,  5,  5,  5,  0,  0, 10, 10,  5,  5,  5, 10,  0,  5,  5,  5, 10,  5],
+    [ 5,  5, 10, 10,  5, 10,  5,  0,  5,  5,  5,  0,  5,  0,  0, 10,  5,  5,  5,  5,  5,  0,  5,  5, 10],
+    [10,  5, 10,  5,  5,  5,  5,  0,  0,  5,  5,  5,  0,  5,  5,  5, 10,  5,  0,  5, 10,  5,  5,  0, 10],
+    [10,  0,  5,  0,  5, 10,  5,  5,  5, 10,  5,  0,  5,  5,  5,  5, 10,  5,  5, 10,  5,  5,  0,  0,  5],
+    [ 0,  5,  5,  5, 10,  5,  5,  0,  5, 10,  0, 10,  5,  5,  5,  5,  5,  0,  5,  0, 10, 10,  5,  5,  5],
+    [ 5,  5, 10,  0,  5,  5, 10, 10,  0,  5,  0,  5,  0, 10, 10,  5,  5,  5,  5,  5,  5,  5,  5,  0,  5],
+    [ 5,  0,  5,  5, 10, 10,  0,  5, 10,  5,  0,  5,  5,  5,  5,  0,  5,  5,  5,  0,  5,  5, 10, 10,  5],
+    [ 5,  5, 10,  5,  0, 10,  5,  5,  5,  5,  5,  5,  5,  5,  0,  5,  5,  5, 10, 10,  0,  5,  0,  0, 10],
+    [ 5,  5,  0, 10, 10,  5,  5,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  0,  5,  0, 10,  5, 10, 10,  5],
+    [ 5,  5,  5,  5,  5,  5,  5,  5,  0,  5, 10,  0, 10,  5,  5,  0,  5, 10,  5, 10,  5,  5, 10,  0,  0],
+    [ 0,  5,  0, 10,  5,  0,  5, 10,  5,  5, 10,  5, 10,  5,  5,  5, 10,  5,  5,  5,  5,  5,  5,  0,  0],
+    [ 0,  0,  0,  0,  5,  5,  5,  5,  5,  5, 10, 10,  5,  5,  5,  5,  5,  5,  5, 10, 10,  5, 10,  0,  5],
+]
 
 # day_penalties = numpy.zeros((7, num_employees))
 # for d in range(7):
@@ -325,14 +337,35 @@ class VarArraySolutionPrinterWithLimit(cp_model.CpSolverSolutionCallback):
 def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
+	mfoCPU_x_iterations = []
+	gwoCPU_x_iterations = []
+	mvoCPU_x_iterations = []
+
+	mfoRAM_x_iterations = []
+	gwoRAM_x_iterations = []
+	mvoRAM_x_iterations = []
 	print("\nStarting GWO\n")
-	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScore_x_iterations)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, 
+	gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations)
 
 	print("Starting MFO\n")
-	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
+	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, 
+	mfoScore_x_iterations, mfoScore_x_time, mfoCPU_x_iterations, mfoRAM_x_iterations)
 
 	print("Starting MVO\n")
-	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
+	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, 
+	mvoScore_x_iterations, mvoScore_x_time, mvoCPU_x_iterations, mvoRAM_x_iterations)
+
+	#PLOT THE RESULTS IN GRAPHS
+
+	#Figure 1 - Fitness Score Vs Iterations
+	plt.figure(1)
+	# naming the x axis
+	plt.xlabel('x - Iterations')
+	# naming the y axis
+	plt.ylabel('y - Fitness Score')
+	# giving a title to my graph
+	plt.title('Fitness Score Vs Iterations')
 
 	# plotting the Moth Flame vs Iterations
 	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
@@ -340,19 +373,75 @@ def main(_):
 	# plotting the Grey Wolf vs Iterations
 	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
 
-		# plotting the Grey Wolf vs Iterations
+	# plotting the Grey Wolf vs Iterations
 	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
-	
-	# naming the x axis
-	plt.xlabel('x - Iterations')
-	# naming the y axis
-	plt.ylabel('y - Fitness Score')
-	# giving a title to my graph
-	plt.title('Fitness Score Vs Iterations')
 	
 	# show a legend on the plot
 	plt.legend()
 	
+	#Figure 2 - Fitness Score Vs Time
+	plt.figure(2)
+	# naming the x axis
+	plt.xlabel('x - Time (s)')
+	# naming the y axis
+	plt.ylabel('y - Fitness Score')
+	# giving a title to my graph
+	plt.title('Fitness Score Vs Time')
+	# plotting the Moth Flame vs Iterations
+	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
+	
+	# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
+
+	# plotting the Multiverse vs Iterations
+	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+
+	
+	# show a legend on the plot
+	plt.legend()
+	
+	#Figure 3 - RAM Vs Iterations
+	plt.figure(3)
+	# naming the x axis
+	plt.xlabel('x - Iterations')
+	# naming the y axis
+	plt.ylabel('y - RAM')
+	# giving a title to my graph
+	plt.title('RAM Vs Iterations')
+	# plotting the Moth Flame vs Iterations
+	plt.plot(interactionsArray, mfoRAM_x_iterations, label = "Moth Flame Optimizer")
+	
+	# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, gwoRAM_x_iterations, label = "Grey Wolf Optimizer")
+
+	# plotting the Multiverse vs Iterations
+	plt.plot(interactionsArray, mvoRAM_x_iterations, label = "Multiverse Optimizer")
+
+	
+	# show a legend on the plot
+	plt.legend()
+
+	#Figure 4 - CPU Vs Iterations
+	plt.figure(4)
+	# naming the x axis
+	plt.xlabel('x - Iterations')
+	# naming the y axis
+	plt.ylabel('y - CPU')
+	# giving a title to my graph
+	plt.title('CPU Vs Iterations')
+	# plotting the Moth Flame vs Iterations
+	plt.plot(interactionsArray, mfoCPU_x_iterations, label = "Moth Flame Optimizer")
+	
+	# plotting the Grey Wolf vs Iterations
+	plt.plot(interactionsArray, gwoCPU_x_iterations, label = "Grey Wolf Optimizer")
+
+	# plotting the Multiverse vs Iterations
+	plt.plot(interactionsArray, mvoCPU_x_iterations, label = "Multiverse Optimizer")
+
+	
+	# show a legend on the plot
+	plt.legend()
+
 	# function to show the plot
 	plt.show()
 
@@ -432,6 +521,12 @@ def NurseFitness(nurse, schedule):
 			sum += shift_penalties[shift][nurse]
 
 		# VIOLATION 4 PREFERENCE TO WORK WITH ANOTHER NURSE
+		if schedule[i] == 1:
+			for otherNurse in range(num_employees):
+				if schedule[otherNurse*num_days*num_shifts + day*num_shifts + shift] == 1:
+					sum += coworker_penalties[otherNurse][nurse]
+				else:
+					sum += 10 - coworker_penalties[otherNurse][nurse]
 	return sum
 	
 def Fitness(schedule):

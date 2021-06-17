@@ -9,9 +9,11 @@ import numpy
 import math
 from solution import solution
 import time
+import psutil
 
 
-def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iterations):
+def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, 
+gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations):
 
     # Max_iter=1000
     # lb=-100
@@ -138,6 +140,8 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
                 ["At iteration " + str(l) + " the best fitness is " + str(Alpha_score)]
             )
             gwoScore_x_iterations.append(Alpha_score)
+            gwoRAM_x_iterations.append(psutil.virtual_memory()[2])
+            gwoCPU_x_iterations.append(psutil.cpu_percent(1))
             # printer(Alpha_pos)
 
 
