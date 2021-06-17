@@ -34,8 +34,8 @@ flags.DEFINE_string('params', 'max_time_in_seconds:300.0',
 					
 					
 # Data
-num_employees = 25
-num_weeks = 2
+num_employees = 4
+num_weeks = 1
 shifts = ['D', 'N']
 day_shift = 0
 night_shift = 1
@@ -48,7 +48,7 @@ mfoScore_x_iterations = []
 gwoScore_x_iterations = []
 mvoScore_x_iterations = []
 
-interactions = 100
+interactions = 2000
 interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
 gwoIterations = []
 mvoIterations = []
@@ -62,46 +62,25 @@ gwoTime = []
 mvoTime = []
 
 shift_penalties = [
-	[5, 10,  5,  5,  0,  0,  5, 10,  0, 10, 10,  5,  5,  0,  5,  0, 10,  5,  5,  0,  5, 10, 10, 10,  5], # Day
-	[5,  0,  5,  5, 10, 10,  5,  0, 10,  0,  0,  5,  5, 10,  5, 10,  0,  5,  5, 10,  5,  0,  0,  0,  5], # Night
+	[ 0,  0, 10, 10], # Day
+	[10, 10,  0,  0], # Night
 ]
 
 day_penalties = [
-	[10, 10,  5,  5,  0,  5, 10, 10, 10,  5,  5,  5,  5,  0,  5,  5,  5,  5,  0,  5,  0,  5,  5,  0,  5], # Mon
-    [ 0,  5, 10,  0,  5,  5,  5,  5,  5,  0,  0,  5,  5, 10,  5, 10, 10,  0, 10,  5,  5,  0,  5,  5,  0], # Tue
-    [ 5,  5,  5,  5,  5,  5,  0,  0, 10, 10,  0,  5, 10,  5,  0,  5,  5, 10,  5, 10, 10,  5, 10,  5,  5], # Wed
-    [ 5,  0,  5,  0, 10, 10,  5,  5,  5,  0, 10, 10,  0, 10, 10, 10, 10,  5,  5,  0,  5, 10,  0,  0, 10], # Thur
-    [ 0,  5,  0,  5,  5, 10,  5, 10,  0,  5,  5, 10,  0,  0,  5,  0,  0,  5,  0,  5,  5,  0,  5, 10, 10], # Fri
-    [10, 10, 10, 10, 10,  0, 10,  0,  0, 10, 10,  0, 10,  5,  0,  5,  0,  0, 10,  0,  0,  5, 10, 10,  5], # Sat
-    [ 5,  0,  0, 10,  0,  0,  0,  5,  5,  5,  5,  0,  5,  5, 10,  0,  5, 10,  5, 10, 10, 10,  0,  5,  0], # Sun
+	[0, 0, 0, 0], # Mon
+    [0, 0, 0, 0], # Tue
+    [0, 0, 0, 0], # Wed
+    [0, 0, 0, 0], # Thur
+    [0, 0, 0, 0], # Fri
+    [0, 0, 0, 0], # Sat
+    [0, 0, 0, 0], # Sun
 ]
 
 coworker_penalties = [
-	[ 5,  5, 10,  5,  5,  5,  5,  0, 10,  0,  0,  5, 10,  5,  0,  5,  5,  5,  5, 10,  0, 10,  5,  5,  5],
-    [10,  0,  5,  0,  0,  5, 10,  5,  5,  5,  5,  5, 10,  5,  5,  5,  5, 10,  5,  5,  5,  0,  5, 10,  0],
-    [ 5, 10,  5, 10,  5,  5,  0,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  0,  5,  5,  5, 10, 10,  0, 10],
-	[ 5,  5,  0, 10,  5,  5,  5,  5,  5,  5,  0, 10,  5,  5,  0,  5, 10, 10,  5,  0,  5,  0,  5, 10,  5],
-    [ 5,  5,  5, 10,  0, 10,  5,  5, 10,  5,  5,  0,  0,  5,  5,  0,  5,  5,  5,  5, 10,  5, 10,  5,  0],
-    [ 5,  5, 10, 10,  5,  0,  5, 10,  5,  5,  5,  5,  0,  0,  0, 10,  5,  5,  5,  5,  5,  5,  0,  5, 10],
-    [ 0,  0, 10,  5,  0,  0, 10,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 10, 10,  5,  5,  5, 10,  0,  5],
-    [ 0, 10,  5, 10,  5,  5,  5,  5,  5,  5,  5,  5,  5, 10,  5,  0,  5,  5,  0,  5,  0,  5, 10,  0, 10],
-    [10,  5,  5, 10,  0,  0,  5,  5, 10,  5,  5,  5,  5,  0,  0,  5, 10,  5,  5,  5,  5,  0,  5, 10,  5],
-    [10, 10,  5,  5,  5, 10,  5,  0,  0,  0,  5, 10,  5,  5,  5,  5, 10,  0,  0,  5,  5,  5,  5,  5,  5],
-    [ 0,  5,  5, 10, 10,  5,  5,  5,  5, 10,  5,  5, 10,  5,  5,  0,  0,  0, 10,  5,  0,  5,  5,  5,  5],
-    [ 5,  0,  0,  5, 10,  5,  0, 10,  5,  5, 10,  5, 10, 10,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  5],
-    [ 5,  0,  5, 10, 10,  0, 10,  5,  0,  5, 10,  5,  0, 10,  5,  5,  0,  5,  5,  5,  5,  5,  5,  5,  5],
-    [ 0,  5,  5, 10,  0,  5,  5,  5,  5,  5,  5,  0,  0, 10, 10,  5,  5,  5, 10,  0,  5,  5,  5, 10,  5],
-    [ 5,  5, 10, 10,  5, 10,  5,  0,  5,  5,  5,  0,  5,  0,  0, 10,  5,  5,  5,  5,  5,  0,  5,  5, 10],
-    [10,  5, 10,  5,  5,  5,  5,  0,  0,  5,  5,  5,  0,  5,  5,  5, 10,  5,  0,  5, 10,  5,  5,  0, 10],
-    [10,  0,  5,  0,  5, 10,  5,  5,  5, 10,  5,  0,  5,  5,  5,  5, 10,  5,  5, 10,  5,  5,  0,  0,  5],
-    [ 0,  5,  5,  5, 10,  5,  5,  0,  5, 10,  0, 10,  5,  5,  5,  5,  5,  0,  5,  0, 10, 10,  5,  5,  5],
-    [ 5,  5, 10,  0,  5,  5, 10, 10,  0,  5,  0,  5,  0, 10, 10,  5,  5,  5,  5,  5,  5,  5,  5,  0,  5],
-    [ 5,  0,  5,  5, 10, 10,  0,  5, 10,  5,  0,  5,  5,  5,  5,  0,  5,  5,  5,  0,  5,  5, 10, 10,  5],
-    [ 5,  5, 10,  5,  0, 10,  5,  5,  5,  5,  5,  5,  5,  5,  0,  5,  5,  5, 10, 10,  0,  5,  0,  0, 10],
-    [ 5,  5,  0, 10, 10,  5,  5,  5,  5,  0,  5,  5,  5,  5,  0,  5,  5,  0,  5,  0, 10,  5, 10, 10,  5],
-    [ 5,  5,  5,  5,  5,  5,  5,  5,  0,  5, 10,  0, 10,  5,  5,  0,  5, 10,  5, 10,  5,  5, 10,  0,  0],
-    [ 0,  5,  0, 10,  5,  0,  5, 10,  5,  5, 10,  5, 10,  5,  5,  5, 10,  5,  5,  5,  5,  5,  5,  0,  0],
-    [ 0,  0,  0,  0,  5,  5,  5,  5,  5,  5, 10, 10,  5,  5,  5,  5,  5,  5,  5, 10, 10,  5, 10,  0,  5],
+	[0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+	[0, 0, 0, 0],
 ]
 
 def negated_bounded_span(works, start, length):
@@ -214,7 +193,7 @@ def solve_shift_scheduling(params, output_proto):
 	day_shifts_per_two_weeks = (1, num_days * num_shifts)
 	
 	# Number of nurses that MUST be assigned to each shift (min, max)
-	required_nurses_per_shift = (7, 7)
+	required_nurses_per_shift = (2, 2)
 
 	model = cp_model.CpModel()
 
@@ -245,14 +224,14 @@ def solve_shift_scheduling(params, output_proto):
 				# (e))
 
 	# Handle the max shifts per week constraint
-	hard_min, hard_max = max_shifts_per_week_constraint
-	for e in range(num_employees):
-		for w in range(num_weeks):
-			works = [work[e, d + w * 7, s] for d in range(7) for s in range(num_shifts)]
-			variables, coeffs = add_soft_sum_constraint(
-				model, works, hard_min, hard_max,
-				'weekly_sum_constraint(employee %i, shift %i, week %i)' %
-				(e, s, w))
+	# hard_min, hard_max = max_shifts_per_week_constraint
+	# for e in range(num_employees):
+	# 	for w in range(num_weeks):
+	# 		works = [work[e, d + w * 7, s] for d in range(7) for s in range(num_shifts)]
+	# 		variables, coeffs = add_soft_sum_constraint(
+	# 			model, works, hard_min, hard_max,
+	# 			'weekly_sum_constraint(employee %i, shift %i, week %i)' %
+	# 			(e, s, w))
 				
 
 	if output_proto:
@@ -328,7 +307,7 @@ def main(_):
 	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
 
 	print("Starting MVO\n")
-	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
+	#MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
 
 	# plotting the Moth Flame vs Iterations
 	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
@@ -337,7 +316,7 @@ def main(_):
 	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
 
 		# plotting the Grey Wolf vs Iterations
-	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+	#plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
 	
 	# naming the x axis
 	plt.xlabel('x - Iterations')
@@ -375,25 +354,25 @@ def CheckValidity(schedule):
 	for d in range(num_days):
 		for s in range(num_shifts):
 			nurses_on_shift = [schedule[i] for i in range(len(schedule)) if (i % (num_days * num_shifts)) // num_shifts == d and i % num_shifts == s].count(1)
-			if nurses_on_shift != 7:
+			if nurses_on_shift != 2:
 				return False	
 
-	for nurse in range(num_employees):
-		day_shift_req_met = False
-		for i in range(nurse * num_days * num_shifts, (nurse+1) * num_days * num_shifts, 2):
-			if schedule[i] == 1:
-				day_shift_req_met = True
-				break
-		if not day_shift_req_met:
-			return False
+	# for nurse in range(num_employees):
+	# 	day_shift_req_met = False
+	# 	for i in range(nurse * num_days * num_shifts, (nurse+1) * num_days * num_shifts, 2):
+	# 		if schedule[i] == 1:
+	# 			day_shift_req_met = True
+	# 			break
+	# 	if not day_shift_req_met:
+	# 		return False
 		
-		for week in range(num_weeks):
-			shift_count = 0
-			for i in range(nurse * week * 7 * num_shifts, nurse * week * 7 * num_shifts + 7 * num_shifts):
-				if schedule[i] == 1:
-					shift_count += 1
-			if shift_count > 4:
-				return False
+	# 	for week in range(num_weeks):
+	# 		shift_count = 0
+	# 		for i in range(nurse * week * 7 * num_shifts, nurse * week * 7 * num_shifts + 7 * num_shifts):
+	# 			if schedule[i] == 1:
+	# 				shift_count += 1
+	# 		if shift_count > 4:
+	# 			return False
 
 	return True
 
@@ -415,25 +394,25 @@ def NurseFitness(nurse, schedule):
 		shift = i % num_shifts
 
 		# VIOLATION 1 BACK TO BACK SHIFTS
-		if i + 1 < nurse_index_range.stop:
-			if schedule[i] == 1 and schedule[i+1] == 1:
-				sum += 10
+		# if i + 1 < nurse_index_range.stop:
+		# 	if schedule[i] == 1 and schedule[i+1] == 1:
+		# 		sum += 10
 
 		# VIOLATION 2 DAY OF PREFERENCE
-		if schedule[i] == 1:
-			sum += day_penalties[day % 7][nurse]
+		# if schedule[i] == 1:
+		# 	sum += day_penalties[day % 7][nurse]
 
 		# VIOLATION 3 PREFERENCE FOR NIGHT OF DAY SHIFTS
 		if schedule[i] == 1:
 			sum += shift_penalties[shift][nurse]
 
 		# VIOLATION 4 PREFERENCE TO WORK WITH ANOTHER NURSE
-		if schedule[i] == 1:
-			for otherNurse in range(num_employees):
-				if schedule[otherNurse*num_days*num_shifts + day*num_shifts + shift] == 1:
-					sum += coworker_penalties[otherNurse][nurse]
-				else:
-					sum += 10 - coworker_penalties[otherNurse][nurse]
+		# if schedule[i] == 1:
+		# 	for otherNurse in range(num_employees):
+		# 		if schedule[otherNurse*num_days*num_shifts + day*num_shifts + shift] == 1:
+		# 			sum += coworker_penalties[otherNurse][nurse]
+		# 		else:
+		# 			sum += 10 - coworker_penalties[otherNurse][nurse]
 
 	return sum
 	

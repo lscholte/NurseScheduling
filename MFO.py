@@ -171,7 +171,7 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer, mfoScore_x_iter
 
 		Iteration = Iteration + 1
 
-	# printer(Best_flame_pos)
+	printer(Best_flame_pos)
 	timerEnd = time.time()
 	s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
 	s.executionTime = timerEnd - timerStart

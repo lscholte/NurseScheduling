@@ -138,9 +138,8 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
                 ["At iteration " + str(l) + " the best fitness is " + str(Alpha_score)]
             )
             gwoScore_x_iterations.append(Alpha_score)
-            # printer(Alpha_pos)
 
-
+    printer(Alpha_pos)
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
