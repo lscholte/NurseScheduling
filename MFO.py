@@ -152,10 +152,7 @@ def MFO(initial_solutions, objf, lb, ub, Max_iteration, printer, mfoScore_x_iter
 						distance_to_flame * math.exp(b * t) * math.cos(t * 2 * math.pi)
 						+ sorted_population[Flame_no, j]
 					)
-			
-			swap_index = random.randrange(dim)
-			Moth_pos[i, swap_index] = abs(Moth_pos[i, swap_index] - 1)
-
+					
 		Convergence_curve[Iteration] = Best_flame_score
 		# Display best fitness along the iteration
 		if Iteration % 1 == 0:
