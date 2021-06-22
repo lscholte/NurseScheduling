@@ -60,7 +60,7 @@ mfoRAM_x_iterations = []
 gwoRAM_x_iterations = []
 mvoRAM_x_iterations = []
 
-interactions = 100
+interactions = 50
 interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
 gwoIterations = []
 mvoIterations = []

@@ -10,7 +10,87 @@ import math
 from solution import solution
 import time
 import psutil
+import os
 
+def nurseNumber(index):
+    shift = index % 28
+    return (index - shift) / 28
+
+def shiftNumber(index):
+    return index % 28
+
+def shiftType(index):
+    return index % 2
+
+def weekNumber(index):
+    shift = index % 28
+    if shift > 13:
+        return 1
+    else:
+        return 0
+
+def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
+
+    index = 0
+    nurse = 0
+    week = 0
+
+    alphaFoundPrey = 0
+
+    for pos in Alpha_Pos:
+    
+
+        if pos == 1 and shiftNumber(index) < 25:
+            # print ("Index", index, "nurse number:", nurseNumber(index), "Week: ", weekNumber(index), 
+            # "Shift:", shiftNumber(index),
+            # "Shift Type:", shiftType(index), "Position:", pos)
+            for swapNurse in range(0, 25):
+
+                swapNurseIndex = (shiftNumber(index)) + swapNurse * 28
+                swapNursePos = Alpha_Pos[swapNurseIndex]
+
+                if (shiftNumber(index) > 0):
+                    swapNurseIndex + 1
+                # print(nurseNumber(index))
+                # print(shiftNumber(index))
+                # print(swapNurseIndex)
+
+                if (nurseNumber(index) != nurseNumber(swapNurseIndex) 
+                    and Alpha_Pos[index] == 1 and Alpha_Pos[index + 1] == 0
+                    and Alpha_Pos[swapNurseIndex + 1] == 1 and Alpha_Pos[swapNurseIndex] == 0):
+                    fitnessBefore = objf(Alpha_Pos)
+                    # print("Before swap", fitnessBefore)
+                    # print("Swapping nurse:", nurseNumber(index), "with nurse: ", nurseNumber(swapNurseIndex))
+                    # printer(simulation)
+
+                    # swap current index
+                    Alpha_Pos[index] = 0
+                    Alpha_Pos[index + 1] = 1
+
+                    Alpha_Pos[swapNurseIndex] = 1
+                    Alpha_Pos[swapNurseIndex + 1] = 0
+
+                    fitnessAfter = objf(Alpha_Pos)
+
+                    
+                    # print("After swap", fitnessAfter)
+                    if fitnessAfter < fitnessBefore:
+                        winner = fitnessAfter
+                        # print(winner)
+                        alphaFoundPrey += 1
+
+                        if alphaFoundPrey == alphasHunting:
+                            return Alpha_Pos
+                        
+                    else:
+                        Alpha_Pos[index] = 1
+                        Alpha_Pos[index + 1] = 0
+                        
+                        Alpha_Pos[swapNurseIndex] = 0
+                        Alpha_Pos[swapNurseIndex + 1] = 1
+                    # printer(simulation)
+        index += 1
+    return Alpha_Pos
 
 def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, 
 gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations):
@@ -20,6 +100,8 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
     # ub=100
     # dim=30
     # SearchAgents_no=5
+
+    alphasHunting = 2
 
     dim = len(initial_solutions[0])
     SearchAgents_no = len(initial_solutions)
@@ -64,6 +146,10 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
 
             # Calculate objective function for each search agent
             fitness = objf(Positions[i, :])
+            # print(fitness)
+            # printer(Alpha_pos)
+            # printer(Beta_pos)
+            # printer(Delta_pos)
 
             # Update Alpha, Beta, and Delta
             if fitness < Alpha_score:
@@ -74,6 +160,8 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
                 Alpha_score = fitness
                 # Update alpha
                 Alpha_pos = Positions[i, :].copy()
+                for i in range(SearchAgents_no):
+                    Positions[i, :] = numpy.array(Positions[i, :].copy())
 
             if fitness > Alpha_score and fitness < Beta_score:
                 Delta_score = Beta_score  # Update delte
@@ -131,7 +219,16 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
                 X3 = Delta_pos[j] - A3 * D_delta
                 # Equation (3.5)-part 3
 
-                Positions[i, j] = (X1 + X2 + X3) / 3  # Equation (3.7)
+                roundedPos = round((X1 + X2 + X3) / 3)
+
+                if  roundedPos > 1:
+                    Positions[i, j] = 1
+                
+                if  roundedPos < 0:
+                    Positions[i, j] = 0
+
+                # Positions[i] = bestPos
+                
 
         Convergence_curve[l] = Alpha_score
 
@@ -140,9 +237,13 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
                 ["At iteration " + str(l) + " the best fitness is " + str(Alpha_score)]
             )
             gwoScore_x_iterations.append(Alpha_score)
+            process = psutil.Process(os.getpid())
+            # print(process.memory_info().vms/ 1024 / 1024)
             gwoRAM_x_iterations.append(psutil.virtual_memory()[2])
             gwoCPU_x_iterations.append(psutil.cpu_percent(1))
-            # printer(Alpha_pos)
+            # printer(bestPos)
+            Alpha_pos = enhancedGreyWolf(Alpha_pos, objf, alphasHunting)
+            Alpha_score = objf(Alpha_pos)
 
 
     timerEnd = time.time()
@@ -153,3 +254,5 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
     s.objfname = objf.__name__
 
     return s
+
+
