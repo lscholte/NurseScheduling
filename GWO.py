@@ -29,7 +29,7 @@ def weekNumber(index):
     else:
         return 0
 
-def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
+def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting, skipIndex):
 
     index = 0
     nurse = 0
@@ -44,7 +44,7 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
             # print ("Index", index, "nurse number:", nurseNumber(index), "Week: ", weekNumber(index), 
             # "Shift:", shiftNumber(index),
             # "Shift Type:", shiftType(index), "Position:", pos)
-            for swapNurse in range(0, 25):
+            for swapNurse in range(0, (25 - skipIndex)):
 
                 swapNurseIndex = (shiftNumber(index)) + swapNurse * 28
                 swapNursePos = Alpha_Pos[swapNurseIndex]
@@ -55,9 +55,12 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
                 # print(shiftNumber(index))
                 # print(swapNurseIndex)
 
+                if (index + skipIndex > 699):
+                    skipIndex = 1
+
                 if (nurseNumber(index) != nurseNumber(swapNurseIndex) 
-                    and Alpha_Pos[index] == 1 and Alpha_Pos[index + 1] == 0
-                    and Alpha_Pos[swapNurseIndex + 1] == 1 and Alpha_Pos[swapNurseIndex] == 0):
+                    and Alpha_Pos[index] == 1 and Alpha_Pos[index + skipIndex] == 0
+                    and Alpha_Pos[swapNurseIndex + skipIndex] == 1 and Alpha_Pos[swapNurseIndex] == 0):
                     fitnessBefore = objf(Alpha_Pos)
                     # print("Before swap", fitnessBefore)
                     # print("Swapping nurse:", nurseNumber(index), "with nurse: ", nurseNumber(swapNurseIndex))
@@ -65,10 +68,10 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
 
                     # swap current index
                     Alpha_Pos[index] = 0
-                    Alpha_Pos[index + 1] = 1
+                    Alpha_Pos[index + skipIndex] = 1
 
                     Alpha_Pos[swapNurseIndex] = 1
-                    Alpha_Pos[swapNurseIndex + 1] = 0
+                    Alpha_Pos[swapNurseIndex + skipIndex] = 0
 
                     fitnessAfter = objf(Alpha_Pos)
 
@@ -84,13 +87,45 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting):
                         
                     else:
                         Alpha_Pos[index] = 1
-                        Alpha_Pos[index + 1] = 0
+                        Alpha_Pos[index + skipIndex] = 0
                         
                         Alpha_Pos[swapNurseIndex] = 0
-                        Alpha_Pos[swapNurseIndex + 1] = 1
+                        Alpha_Pos[swapNurseIndex + skipIndex] = 1
                     # printer(simulation)
         index += 1
     return Alpha_Pos
+
+def organizePack(schedule):
+    wolfPack = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 
+            1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 
+            1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 
+            1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 
+            1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 
+            1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 
+            1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 
+            0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 
+            0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 
+            0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 
+            0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 
+            0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
+            0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 
+            0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
+            0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 
+            0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 
+            0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+            0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 
+            0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 
+            0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 
+            0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 
+            0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+            0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+            0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 
+            0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1]
+
+    return wolfPack
+
+    
+    
 
 def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, 
 gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations):
@@ -100,8 +135,10 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
     # ub=100
     # dim=30
     # SearchAgents_no=5
+    winner = 99999999
+    skipIndex = 1
 
-    alphasHunting = 2
+    alphasHunting = 50
 
     dim = len(initial_solutions[0])
     SearchAgents_no = len(initial_solutions)
@@ -242,9 +279,21 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
             gwoRAM_x_iterations.append(psutil.virtual_memory()[2])
             gwoCPU_x_iterations.append(psutil.cpu_percent(1))
             # printer(bestPos)
-            Alpha_pos = enhancedGreyWolf(Alpha_pos, objf, alphasHunting)
+
+            if l == 1:
+                Alpha_pos = organizePack(Alpha_pos)
+
+            Alpha_pos = enhancedGreyWolf(Alpha_pos, objf, alphasHunting, skipIndex % 28)
             Alpha_score = objf(Alpha_pos)
 
+            if (winner == Alpha_score):
+                skipIndex += 1
+            winner = Alpha_score
+
+            print(skipIndex)
+            print(skipIndex % 28)
+
+            
 
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
