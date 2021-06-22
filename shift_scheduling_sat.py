@@ -323,7 +323,6 @@ def main(_):
 	# naming the y axis
 	plt.ylabel('Fitness Score')
 	# giving a title to my graph
-	plt.title('Fitness Score Vs Iterations')
 	
 	# show a legend on the plot
 	plt.legend()
