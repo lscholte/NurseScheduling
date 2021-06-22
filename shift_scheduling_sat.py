@@ -319,9 +319,9 @@ def main(_):
 	#plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
 	
 	# naming the x axis
-	plt.xlabel('x - Iterations')
+	plt.xlabel('Iterations')
 	# naming the y axis
-	plt.ylabel('y - Fitness Score')
+	plt.ylabel('Fitness Score')
 	# giving a title to my graph
 	plt.title('Fitness Score Vs Iterations')
 	

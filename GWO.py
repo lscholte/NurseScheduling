@@ -9,15 +9,93 @@ import numpy
 import math
 from solution import solution
 import time
+import psutil
+import os
+
+def nurseNumber(index):
+    shift = index % 14
+    return (index - shift) / 14
+
+def shiftNumber(index):
+    return index % 14
+
+def shiftType(index):
+    return index % 2
+
+def weekNumber(index):
+    shift = index % 14
+    if shift > 13:
+        return 1
+    else:
+        return 0
+
+def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting, skipIndex, printer):
+
+    index = 0
+    nurse = 0
+    week = 0
+    alphasHunting = 1
+    alphaFoundPrey = 0
+
+    for pos in Alpha_Pos:
+    
+
+        if shiftNumber(index) < 14:
+
+            for swapNurse in range(0, 4):
+
+                swapNurseIndex = (shiftNumber(index)) + swapNurse * 14
+
+                if (shiftNumber(index) > 0):
+                    swapNurseIndex + 1
+
+                if (nurseNumber(index) != nurseNumber(swapNurseIndex)
+                    and Alpha_Pos[index] != Alpha_Pos[swapNurseIndex]
+                    and shiftNumber(index) == shiftNumber(swapNurseIndex) and skipIndex == 0):
+                    
+                    fitnessBefore = objf(Alpha_Pos)
+                    
+                    # swap current index
+                    indexPos = Alpha_Pos[index]
+                    swapPos = Alpha_Pos[swapNurseIndex]
+                    Alpha_Pos[index] = swapPos
+                    Alpha_Pos[swapNurseIndex] = indexPos
+
+                    fitnessAfter = objf(Alpha_Pos)
+                    # print(fitnessAfter)
+                    
+                    # print("After swap", fitnessAfter)
+                    if fitnessAfter < fitnessBefore:
+                        winner = fitnessAfter
+                        alphaFoundPrey += 1
+
+                        if alphaFoundPrey == alphasHunting:
+                            return Alpha_Pos
+                        
+                    else:
+                        Alpha_Pos[index] = indexPos
+                        Alpha_Pos[swapNurseIndex] = swapPos
 
 
-def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iterations):
+
+        index += 1
+    return Alpha_Pos
+
+    
+    
+
+def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, 
+gwoScore_x_iterations):
 
     # Max_iter=1000
     # lb=-100
     # ub=100
     # dim=30
     # SearchAgents_no=5
+    winner = 99999999
+    skipIndex = 1
+
+    alphasHunting = 20
 
     dim = len(initial_solutions[0])
     SearchAgents_no = len(initial_solutions)
@@ -62,6 +140,10 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
 
             # Calculate objective function for each search agent
             fitness = objf(Positions[i, :])
+            # print(fitness)
+            # printer(Alpha_pos)
+            # printer(Beta_pos)
+            # printer(Delta_pos)
 
             # Update Alpha, Beta, and Delta
             if fitness < Alpha_score:
@@ -72,6 +154,8 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
                 Alpha_score = fitness
                 # Update alpha
                 Alpha_pos = Positions[i, :].copy()
+                for i in range(SearchAgents_no):
+                    Positions[i, :] = numpy.array(Positions[i, :].copy())
 
             if fitness > Alpha_score and fitness < Beta_score:
                 Delta_score = Beta_score  # Update delte
@@ -129,7 +213,16 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
                 X3 = Delta_pos[j] - A3 * D_delta
                 # Equation (3.5)-part 3
 
-                Positions[i, j] = (X1 + X2 + X3) / 3  # Equation (3.7)
+                roundedPos = round((X1 + X2 + X3) / 3)
+
+                if  roundedPos > 1:
+                    Positions[i, j] = 1
+                
+                if  roundedPos < 0:
+                    Positions[i, j] = 0
+
+                # Positions[i] = bestPos
+                
 
         Convergence_curve[l] = Alpha_score
 
@@ -139,7 +232,15 @@ def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, gwoScore_x_iteration
             )
             gwoScore_x_iterations.append(Alpha_score)
 
-    printer(Alpha_pos)
+            Alpha_pos = enhancedGreyWolf(Alpha_pos, objf, alphasHunting, l % 14, printer)
+            Alpha_score = objf(Alpha_pos)
+
+            if (winner == Alpha_score):
+                skipIndex += 1
+            winner = Alpha_score
+
+            
+
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     s.executionTime = timerEnd - timerStart
