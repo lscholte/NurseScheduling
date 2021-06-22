@@ -100,7 +100,7 @@ def organizePack(Alpha_Pos, objf, alphasHunting):
     index = 0
     nurse = 0
     week = 0
-    alphasHunting = 10
+    alphasHunting = 625
     alphaFoundPrey = 0
 
     for pos in Alpha_Pos:
@@ -309,7 +309,7 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
                 stuckIndex += 1
 
             if (stuckIndex == 5):
-                # Organize the Pack
+                print("Waiting wolf alphas re-organize the pack")
                 Alpha_pos = organizePack(Alpha_pos, objf, alphasHunting)
                 Alpha_score = objf(Alpha_pos)
                 stuckIndex = 0
