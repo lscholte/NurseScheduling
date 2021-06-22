@@ -48,7 +48,7 @@ mfoScore_x_iterations = []
 gwoScore_x_iterations = []
 mvoScore_x_iterations = []
 
-interactions = 100
+interactions = 1000
 interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
 gwoIterations = []
 mvoIterations = []
@@ -340,11 +340,10 @@ def main(_):
 	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
 	
 	# naming the x axis
-	plt.xlabel('x - Iterations')
+	plt.xlabel('Iterations')
 	# naming the y axis
-	plt.ylabel('y - Fitness Score')
+	plt.ylabel('Fitness Score')
 	# giving a title to my graph
-	plt.title('Fitness Score Vs Iterations')
 	
 	# show a legend on the plot
 	plt.legend()
