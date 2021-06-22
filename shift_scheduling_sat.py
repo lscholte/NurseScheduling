@@ -48,7 +48,7 @@ mfoScore_x_iterations = []
 gwoScore_x_iterations = []
 mvoScore_x_iterations = []
 
-interactions = 2000
+interactions = 500
 interactionsArray = np.arange(start=1, stop=interactions+1, step=1)
 gwoIterations = []
 mvoIterations = []
@@ -307,7 +307,7 @@ def main(_):
 	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
 
 	print("Starting MVO\n")
-	#MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
+	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
 
 	# plotting the Moth Flame vs Iterations
 	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
@@ -316,12 +316,12 @@ def main(_):
 	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
 
 		# plotting the Grey Wolf vs Iterations
-	#plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
 	
 	# naming the x axis
-	plt.xlabel('x - Iterations')
+	plt.xlabel('Iterations')
 	# naming the y axis
-	plt.ylabel('y - Fitness Score')
+	plt.ylabel('Fitness Score')
 	# giving a title to my graph
 	plt.title('Fitness Score Vs Iterations')
 	
