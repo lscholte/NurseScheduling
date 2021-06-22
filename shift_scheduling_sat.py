@@ -61,6 +61,8 @@ mfoTime = []
 gwoTime = []
 mvoTime = []
 
+gwoScoreAlphas = [[], [], [], []]
+
 shift_penalties = [
 	[5, 10,  5,  5,  0,  0,  5, 10,  0, 10, 10,  5,  5,  0,  5,  0, 10,  5,  5,  0,  5, 10, 10, 10,  5], # Day
 	[5,  0,  5,  5, 10, 10,  5,  0, 10,  0,  0,  5,  5, 10,  5, 10,  0,  5,  5, 10,  5,  0,  0,  0,  5], # Night
@@ -322,7 +324,10 @@ def main(_):
 	solutions = solve_shift_scheduling(FLAGS.params, FLAGS.output_proto)
 	
 	print("\nStarting GWO\n")
-	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScore_x_iterations)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScoreAlphas[0], 5)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScoreAlphas[1], 20)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScoreAlphas[2], 35)
+	GWO.GWO(solutions, Fitness, 0, 1, interactions, PrintSchedule, gwoScoreAlphas[3], 50)
 
 	print("Starting MFO\n")
 	MFO.MFO(solutions, Fitness, 0, 1, interactions+1, PrintSchedule, mfoScore_x_iterations)
@@ -331,20 +336,41 @@ def main(_):
 	MVO.MVO(solutions, Fitness, 0, 1, interactions, PrintSchedule, mvoScore_x_iterations)
 
 	# plotting the Moth Flame vs Iterations
-	plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
+	#Figure 1 - Fitness Score Vs Iterations
+	# plt.figure(1)
+	# # naming the x axis
+	# plt.xlabel('Iterations')
+	# # naming the y axis
+	# plt.ylabel('Fitness Score')
+	# # giving a title to my graph
+	# plt.title('Fitness Score Vs Iterations')
+	# plt.plot(interactionsArray, mfoScore_x_iterations, label = "Moth Flame Optimizer")
+	# # show a legend on the plot
+	# plt.legend()
 	
 	# plotting the Grey Wolf vs Iterations
-	plt.plot(interactionsArray, gwoScore_x_iterations, label = "Grey Wolf Optimizer")
-
-		# plotting the Grey Wolf vs Iterations
-	plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
-	
+	#Figure 2 - Fitness Score Vs Iterations
+	plt.figure(2)
 	# naming the x axis
-	plt.xlabel('x - Iterations')
+	plt.xlabel('Iterations')
 	# naming the y axis
-	plt.ylabel('y - Fitness Score')
+	plt.ylabel('Fitness Score')
 	# giving a title to my graph
-	plt.title('Fitness Score Vs Iterations')
+	plt.title('Fitness Score Vs Iterations (Grey Wolf)')
+	plt.plot(interactionsArray, gwoScoreAlphas[0], label = "5 Alphas")
+	plt.plot(interactionsArray, gwoScoreAlphas[1], label = "20 Alphas")
+	plt.plot(interactionsArray, gwoScoreAlphas[2], label = "35 Alphas")
+	plt.plot(interactionsArray, gwoScoreAlphas[3], label = "50 Alphas")
+
+	# # plotting the Multiverse vs Iterations
+	# plt.plot(interactionsArray, mvoScore_x_iterations, label = "Multiverse Optimizer")
+	
+	# # naming the x axis
+	# plt.xlabel('Iterations')
+	# # naming the y axis
+	# plt.ylabel('Fitness Score')
+	# # giving a title to my graph
+	# plt.title('Fitness Score Vs Iterations')
 	
 	# show a legend on the plot
 	plt.legend()
