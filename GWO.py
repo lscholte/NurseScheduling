@@ -308,7 +308,7 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
                 skipIndex += 1
                 stuckIndex += 1
 
-            if (stuckIndex == 20):
+            if (stuckIndex == 10):
                 print("Waiting alpha wolves re-organize the pack")
                 Alpha_pos = organizePack(Alpha_pos, objf, alphasHunting)
                 Alpha_score = objf(Alpha_pos)
