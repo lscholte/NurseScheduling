@@ -77,7 +77,7 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting, skipIndex):
 
                     
                     # print("After swap", fitnessAfter)
-                    if fitnessAfter < fitnessBefore:
+                    if fitnessAfter <= fitnessBefore:
                         winner = fitnessAfter
                         # print(winner)
                         alphaFoundPrey += 1
@@ -95,8 +95,57 @@ def enhancedGreyWolf(Alpha_Pos, objf, alphasHunting, skipIndex):
         index += 1
     return Alpha_Pos
 
+def organizePack(Alpha_Pos, objf, alphasHunting):
+
+    index = 0
+    nurse = 0
+    week = 0
+    alphasHunting = 10
+    alphaFoundPrey = 0
+
+    for pos in Alpha_Pos:
     
-    
+
+        if shiftNumber(index) < 28:
+
+            for swapNurse in range(0, 25):
+
+                swapNurseIndex = (shiftNumber(index)) + swapNurse * 28
+
+                if (shiftNumber(index) > 0):
+                    swapNurseIndex + 1
+
+                if (nurseNumber(index) != nurseNumber(swapNurseIndex)
+                    and Alpha_Pos[index] != Alpha_Pos[swapNurseIndex]
+                    and shiftNumber(index) == shiftNumber(swapNurseIndex)):
+                    
+                    fitnessBefore = objf(Alpha_Pos)
+                    
+                    # swap current index
+                    indexPos = Alpha_Pos[index]
+                    swapPos = Alpha_Pos[swapNurseIndex]
+                    Alpha_Pos[index] = swapPos
+                    Alpha_Pos[swapNurseIndex] = indexPos
+
+                    fitnessAfter = objf(Alpha_Pos)
+                    # print(fitnessAfter)
+                    
+                    # print("After swap", fitnessAfter)
+                    if fitnessAfter <= fitnessBefore:
+                        winner = fitnessAfter
+                        alphaFoundPrey += 1
+
+                        if alphaFoundPrey == alphasHunting:
+                            return Alpha_Pos
+                        
+                    else:
+                        Alpha_Pos[index] = indexPos
+                        Alpha_Pos[swapNurseIndex] = swapPos
+
+
+
+        index += 1
+    return Alpha_Pos
 
 def GWO(initial_solutions, objf, lb, ub, Max_iter, printer, 
 gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations):
@@ -109,7 +158,8 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
     winner = 99999999
     skipIndex = 1
 
-    alphasHunting = 50
+    alphasHunting = 20
+    stuckIndex = 0
 
     dim = len(initial_solutions[0])
     SearchAgents_no = len(initial_solutions)
@@ -256,10 +306,16 @@ gwoScore_x_iterations, gwoScore_x_time, gwoCPU_x_iterations, gwoRAM_x_iterations
 
             if (winner == Alpha_score):
                 skipIndex += 1
-            winner = Alpha_score
+                stuckIndex += 1
 
-            print(skipIndex)
-            print(skipIndex % 28)
+            if (stuckIndex == 5):
+                # Organize the Pack
+                Alpha_pos = organizePack(Alpha_pos, objf, alphasHunting)
+                Alpha_score = objf(Alpha_pos)
+                stuckIndex = 0
+
+            
+            winner = Alpha_score
 
             
 
