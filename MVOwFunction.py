@@ -12,8 +12,9 @@ import math
 import sklearn
 from numpy import asarray
 from sklearn.preprocessing import normalize
-from solution import solution
+from sol import solution
 from ElementSwitch import makeSwitch
+from ElementSwitch import shiftSwitch
 
 
 
@@ -63,13 +64,13 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iteration
     # lb=-100
     # ub=100
     dim = len(initial_solutions[0])
-    N = len(initial_solutions)
+    # N = len(initial_solutions)
 
 
     WEP_Max = 1
     WEP_Min = 0.2
     # Max_time=1000
-    # N=50
+    N = len(initial_solutions)
     if not isinstance(lb, list):
         lb = [lb] * dim
     if not isinstance(ub, list):
@@ -98,10 +99,6 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iteration
     s.startTime = time.strftime("%Y-%m-%d-%H-%M-%S")
     while Time < Max_time + 1:
 
-        for i in range(N):
-            print(objf(Universes[i]))
-        
-        print("newit")
 
         "Eq. (3.3) in the paper"
         WEP = WEP_Min + Time * ((WEP_Max - WEP_Min) / Max_time)
@@ -136,36 +133,123 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iteration
             )
 
         normalized_sorted_Inflation_rates = numpy.copy(normr(sorted_Inflation_rates))
+        
 
         #Universes are sorted
         Universes[0, :] = numpy.array(Sorted_universes[0, :])
+
+        positiveImpact = []
+        # [impact, sendingSchedule, shift]
+        bestImpact = []
+        bestImpact.append(Sorted_universes[0])
+        bestImpact.append(0)
+        
+        bestInflation = sorted_Inflation_rates[0]
 
         for i in range(1, N):
             
             Black_hole_index = i
 
+            fitnessDif = []
+
             #Universes swap dimensional properties according to inflation rate
-            for j in range(0, dim):
-                r1 = random.random()
+            # Try: swapping whole schedule
+            for j in range(0, 28):
+                r1 = float(random.randrange(int(normalized_sorted_Inflation_rates[0] * 100000000), int(normalized_sorted_Inflation_rates[-1] * 100000000)) / 100000000)
                 
-                if r1 < normalized_sorted_Inflation_rates[Black_hole_index]:
+                if r1 < normalized_sorted_Inflation_rates[i]:
+                    
                     White_hole_index = RouletteWheelSelection(-sorted_Inflation_rates)
 
                     if White_hole_index == -1:
                         White_hole_index = 0
-                    White_hole_index = 0
+                    #White_hole_index = 0
 
-                    makeSwitch(Universes[Black_hole_index], Universes[White_hole_index], j, dim)
+                    
+                    savedUni = []
+                    for k in range(dim):
+                        savedUni.append(Universes[Black_hole_index, k])
+
+                    fitness = objf(Universes[Black_hole_index])
+                    shiftSwitch(j, Universes[Black_hole_index], Sorted_universes[White_hole_index], objf)
+                    #makeSwitch(Universes[Black_hole_index], Sorted_universes[White_hole_index], j, objf)
+                    after = objf(Universes[Black_hole_index])
+                    dif = fitness - after
+
+                    if dif < 0:
+                        Universes[Black_hole_index] = savedUni
+                    if after < bestInflation:
+                        bestInflation = after 
+                        bestImpact[0] = Universes[Black_hole_index]
+                        bestImpact[1] = j
+                        Best_universe = Universes[Black_hole_index]
+                        
+                    #     for h in range(1, N):
+                    #         fitness = objf(Universes[h])
+                    #         savedUni = []
+                    #         for k in range(len(Universes[h])):
+                    #             savedUni.append(Universes[h, k])
+                    #         shiftSwitch(bestImpact[1], Universes[h], bestImpact[0])
+                    #         after = objf(Universes[h])
+                    #         dif = fitness - after
+                    #         if dif < 0:
+                    #             Universes[h] = savedUni
+                    #         if after < bestInflation:
+                    #             bestInflation = after
+                    #             bestImpact[0] = Universes[h]
+                    #             Best_universe = Universes[h]
                             
+                        
 
                         
                 r2 = random.random()
                 
                 #Worm holes appeear to randomly distribute dimensions from best universe
                 if r2 < WEP:
-                    makeSwitch(Universes[Black_hole_index], Best_universe, j, dim)
-                     # random.uniform(0,1)+lb);
 
+                    savedUni = []
+                    for k in range(len(Universes[Black_hole_index])):
+                        savedUni.append(Universes[Black_hole_index, k])
+                    fitness = objf(Universes[Black_hole_index])
+                    # makeSwitch(Universes[Black_hole_index], Best_universe, j, objf)                    
+                    shiftSwitch(j, Universes[Black_hole_index], Best_universe, objf)
+                    after = objf(Universes[Black_hole_index])
+                    dif = fitness - after
+                    if dif < 0:
+                        Universes[Black_hole_index] = savedUni
+                    if after < bestInflation:
+                        bestInflation = after
+                        bestImpact[0] = Best_universe
+                        bestImpact[1] = j
+
+                        # for h in range(1, N):
+                        #     fitness = objf(Universes[h])
+                        #     savedUni = []
+                        #     for k in range(len(Universes[h])):
+                        #         savedUni.append(Universes[h, k])
+                        #     shiftSwitch(bestImpact[1], Universes[h], bestImpact[0], objf)
+                        #     after = objf(Universes[h])
+                        #     dif = fitness - after
+                        #     if dif < 0:
+                        #         Universes[h] = savedUni
+
+        for h in range(1, N):
+            fitness = objf(Universes[h])
+            savedUni = []
+            for k in range(len(Universes[h])):
+                savedUni.append(Universes[h, k])
+            shiftSwitch(bestImpact[1], Universes[h], bestImpact[0], objf)
+            after = objf(Universes[h])
+            dif = fitness - after
+            if dif < 0:
+                Universes[h] = savedUni
+
+
+            
+        for i in range(len(Universes)):
+            print(objf(Universes[i]))
+        
+            
 
 
         convergence[Time - 1] = Best_universe_Inflation_rate
@@ -184,18 +268,18 @@ def MVO(initial_solutions, objf, lb, ub, Max_time, printer, mvoScore_x_iteration
 
         Time = Time + 1
 
-        # if Time == 10 or Time == 9:
-        #     # for universe in Universes:
-        #     #     print(Best_universe - universe)
-        #     #     sum = 0
-        #     #     for i in range(len(universe)):
-        #     #         sum += universe[i]
-        #     #     print(sum)
-        #     print("Best")
-        #     printer(Best_universe)
-        #     print("Others")
-        #     for uni in Universes:
-        #         printer(uni)
+        #if Time == 2 or Time == 3:
+            # for universe in Universes:
+            #     print(Best_universe - universe)
+            #     sum = 0
+            #     for i in range(len(universe)):
+            #         sum += universe[i]
+            #     print(sum)
+            # print("Best")
+            # printer(Best_universe)
+            # print("Others")
+            # for uni in Universes:
+            #     printer(uni)
 
     timerEnd = time.time()
     s.endTime = time.strftime("%Y-%m-%d-%H-%M-%S")
